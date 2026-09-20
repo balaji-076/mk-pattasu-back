@@ -1,0 +1,8 @@
+.env
+.env.*
+bootstrap/cache/config.php
+node_modules
+vendor
+.git
+.gitignore
+docker-compose.yml
