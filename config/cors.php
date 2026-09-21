@@ -7,11 +7,8 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://www.kmvfireworks.sbs',
-        'https://kmvfireworks.sbs',
         'http://localhost:5173',
-        'https://kmvfireworks.com',
-        'https://react-frontend-production-6ffd.up.railway.app'
+        'https://api.mkpattasukadai.com'
         
     ],
 
