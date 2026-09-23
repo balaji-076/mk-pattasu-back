@@ -8,7 +8,8 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',
-        'https://api.mkpattasukadai.com'
+        'https://api.mkpattasukadai.com',
+        'https://mkpattasukadai.com',
         
     ],
 
