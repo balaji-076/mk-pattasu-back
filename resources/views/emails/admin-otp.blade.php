@@ -33,7 +33,7 @@
               font-size:20px;
               color:#111;
             ">
-              KMV Traders & Fireworks
+              Mk Pattasu Kadai
             </h2>
 
             <p style="
@@ -115,7 +115,7 @@
         margin-top:12px;
         text-align:center;
       ">
-        © {{ date('Y') }} KMV Traders & Fireworks. All rights reserved.
+        © {{ date('Y') }} Mk Pattasu Kadai. All rights reserved.
       </p>
 
     </td>

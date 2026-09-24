@@ -154,14 +154,14 @@ class OrderService
         $grandTotal = collect($order->items)->sum(fn ($item) => (float) $item->subtotal);
 
         $msg  = "Dear {$customer->name},\n\n";
-        $msg .= "Thank you for shopping with KMV Traders & Fireworks.\n";
+        $msg .= "Thank you for shopping with Mk Pattasu Kadai.\n";
         $msg .= "Your order has been placed successfully.\n\n";
         $msg .= "Order No: {$order->order_number}\n";
         $msg .= "Amount: ₹{$grandTotal}\n\n";
         $msg .= "Track your order:\n";
-        $msg .= "https://kmvfireworks.com/order-status/{$order->order_number}\n\n";
+        $msg .= "https://mkpattasukadai.com/order-status/{$order->order_number}\n\n";
         $msg .= "Warm regards,\n";
-        $msg .= "KMV Traders & Fireworks";
+        $msg .= "Mk Pattasu Kadai";
 
         return rawurlencode($msg);
     }
@@ -184,25 +184,26 @@ class OrderService
 
     private function composeAdminTelegramAlert(Orders $order, array $orderItems, Customer $customer): string
     {
-        $items = collect($orderItems);
-        $lineItems = $items
-            ->take(self::TELEGRAM_MAX_LINE_ITEMS)
-            ->map(fn ($i) => '• ' . e($i['product_name']) . ' × ' . $i['quantity']
-                . ' = ₹' . number_format($i['subtotal'], 2))
-            ->implode("\n");
+        $items     = collect($orderItems);
+        $itemCount = $items->count();               // different products
+        $totalQty  = (int) $items->sum('quantity'); // total quantity
 
-        $remaining = $items->count() - self::TELEGRAM_MAX_LINE_ITEMS;
-        if ($remaining > 0) {
-            $lineItems .= "\n…and {$remaining} more item(s). Check the admin panel.";
-        }
+        // Admin order link
+        $orderUrl = url("/admin/orders/{$order->id}");
+
+        // Customer WhatsApp link (message already URL-encoded)
+        $digits = substr(preg_replace('/\D+/', '', (string) $customer->mobile), -10);
+        $waUrl  = 'https://wa.me/91' . $digits . '?text=' . $this->buildWhatsAppMessage($order, $customer);
 
         return "<b>New Order Received</b>\n\n"
             . "<b>Order No:</b> {$order->order_number}\n"
             . '<b>Customer:</b> ' . e($customer->name) . "\n"
             . "<b>Mobile:</b> {$customer->mobile}\n"
             . '<b>Location:</b> ' . e("{$customer->city}, {$customer->state} - {$customer->pincode}") . "\n\n"
-            . "<b>Items</b>\n{$lineItems}\n\n"
-            . '<b>Total: ₹' . number_format((float) $order->total_amount, 2) . '</b>';
+            . "<b>Total Items:</b> {$itemCount} (Qty: {$totalQty})\n"
+            . '<b>Total: ₹' . number_format((float) $order->total_amount, 2) . "</b>\n\n"
+            . '<a href="' . e($orderUrl) . '">🔗 View Order</a>' . "\n"
+            . '<a href="' . e($waUrl) . '">💬 WhatsApp Customer</a>';
     }
 
     public function deleteOrder(int $id): void

@@ -358,7 +358,7 @@ class ProductService
 
     public function createBill(array $data): PosBill
     {
-        $billNo = 'KMV-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+        $billNo = 'MK-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
         return PosBill::create([
             'bill_no'         => $billNo,
