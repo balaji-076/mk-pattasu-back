@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ComboPackController;
 use App\Http\Controllers\CommonController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -55,6 +56,7 @@ Route::prefix('orders')->group(function () {
     Route::put('/{id}/whatsapp-sent', [OrderController::class, 'markWhatsAppSent'])->whereNumber('id');
 });
 
+Route::get('/get/combo-offers/{id}/items', [ComboPackController::class, 'show']);
 /* -------------------------------------------------------------------------- */
 /* POS BILLS ROUTES                                                           */
 /* -------------------------------------------------------------------------- */

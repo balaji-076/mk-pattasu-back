@@ -2,6 +2,7 @@
 
 namespace App\Models\product;
 
+use App\Models\ComboPackItems;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,7 +47,12 @@ class ComboOffer extends Model
 
     public function items()
     {
-        return $this->hasMany(ComboOfferItem::class);
+        return $this->hasMany(ComboOfferItems::class);
+    }
+
+    public function itemsList()
+    {
+        return $this->hasMany(ComboPackItems::class, 'combo_pack_id');
     }
 
     protected static function booted(): void

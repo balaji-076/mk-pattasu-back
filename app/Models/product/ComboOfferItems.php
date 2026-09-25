@@ -5,7 +5,7 @@ namespace App\Models\product;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 
-class ComboOfferItem extends Model
+class ComboOfferItems extends Model
 {
     protected $table = 'combo_offer_items';
 
