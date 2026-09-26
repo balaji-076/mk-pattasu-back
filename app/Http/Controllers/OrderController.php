@@ -56,19 +56,50 @@ class OrderController extends Controller
     // =========================================================================
     public function createOrder(Request $request): JsonResponse
     {
+        $items = collect($request->input('items', []))->map(function ($item) {
+            $isCombo = filter_var($item['is_combo'] ?? false, FILTER_VALIDATE_BOOLEAN)
+                || (isset($item['id']) && str_starts_with((string) $item['id'], 'combo_'));
+
+            if ($isCombo) {
+                unset($item['id']); // products.id ku ethiraana "combo_1" pogama irukka
+            }
+
+            $item['is_combo'] = $isCombo;
+
+            return $item;
+        })->toArray();
+
+        $request->merge(['items' => $items]);
+
         $validated = $request->validate([
             'customer.name'         => 'required|string|max:255',
             'customer.phone'        => 'required|string|max:15',
             'customer.email'        => 'nullable|email',
-            // 'customer.address'      => 'nullable|string',
             'customer.city'         => 'required|string',
             'customer.state'        => 'required|string',
             'customer.postcode'     => 'required|string',
+
             'items'                 => 'required|array|min:1',
-            'items.*.id'            => 'required|integer|exists:products,id',
+            'items.*.is_combo'      => 'required|boolean',
+
+            'items.*.id'            => [
+                'exclude_if:items.*.is_combo,true',
+                'required',
+                'integer',
+                'exists:products,id',
+            ],
+
+            'items.*.combo_id'      => [
+                'exclude_if:items.*.is_combo,false',
+                'required',
+                'integer',
+                'exists:combo_offers,id',
+            ],
+
             'items.*.name'          => 'required|string',
             'items.*.discount_rate' => 'required|numeric|min:0',
             'items.*.qty'           => 'required|integer|min:1',
+
             'total'                 => 'required|numeric|min:0',
         ]);
 
@@ -84,7 +115,6 @@ class OrderController extends Controller
             201
         );
     }
-
     // =========================================================================
     // PUT /orders/{id}/status
     // =========================================================================

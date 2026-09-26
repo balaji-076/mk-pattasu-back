@@ -180,59 +180,59 @@ class ComboPackItemSeeder extends Seeder
     //     }
     // }
 
-    // public function run(): void
-    // {
-    //     $comboPackId = 2;
+    public function run(): void
+    {
+        $comboPackId = 2;
 
-    //     $items = [
-    //         '2 ¾" Kuruvi',
-    //         '5" Kuruvi',
-    //         '5" Bahubali',
-    //         '6" Lion King',
-    //         'Ground Chakkar Spl',
-    //         'Flower Pot Ashoka',
-    //         'Paper Bomb ½ kg Jallikattu',
-    //         'Paper Bomb ½ kg',
-    //         'Classic Bomb',
-    //         'Mega Digital Bomb',
-    //         '4" Twinkling Star',
-    //         'Rocket Bomb',
-    //         '5K Wala',
-    //         'Helicopter',
-    //         'Kinder Joy',
-    //         'Peacock 3 in 1',
-    //         'Smoke - 3 pcs',
-    //         'Siren Mega',
-    //         'Red Sun',
-    //         '2" Pipe Single',
-    //         'Tom and Jerry',
-    //         'Natchathiram (Lotus)',
-    //         'Penta',
-    //         'Kit Kat',
-    //         'Crackling Fountain',
-    //         'Chotta Fancy',
-    //         'Melody - 3 pcs',
-    //         '3 ½" Nayagra',
-    //         '3 ½" Fancy Pipe',
-    //         '3 ½" Double Ball',
-    //         '60 Shot Multi Colour',
-    //         '12 cm Electric Sparklers',
-    //         '12 cm Colour Sparklers',
-    //         '15 cm Green Sparklers',
-    //         '30 cm Red Sparklers',
-    //     ];
+        $items = [
+            '2 ¾" Kuruvi',
+            '5" Kuruvi',
+            '5" Bahubali',
+            '6" Lion King',
+            'Ground Chakkar Spl',
+            'Flower Pot Ashoka',
+            'Paper Bomb ½ kg Jallikattu',
+            'Paper Bomb ½ kg',
+            'Classic Bomb',
+            'Mega Digital Bomb',
+            '4" Twinkling Star',
+            'Rocket Bomb',
+            '5K Wala',
+            'Helicopter',
+            'Kinder Joy',
+            'Peacock 3 in 1',
+            'Smoke - 3 pcs',
+            'Siren Mega',
+            'Red Sun',
+            '2" Pipe Single',
+            'Tom and Jerry',
+            'Natchathiram (Lotus)',
+            'Penta',
+            'Kit Kat',
+            'Crackling Fountain',
+            'Chotta Fancy',
+            'Melody - 3 pcs',
+            '3 ½" Nayagra',
+            '3 ½" Fancy Pipe',
+            '3 ½" Double Ball',
+            '60 Shot Multi Colour',
+            '12 cm Electric Sparklers',
+            '12 cm Colour Sparklers',
+            '15 cm Green Sparklers',
+            '30 cm Red Sparklers',
+        ];
 
-    //     foreach ($items as $index => $name) {
-    //         ComboPackItems::updateOrCreate(
-    //             [
-    //                 'combo_pack_id' => $comboPackId,
-    //                 'name'          => $name,
-    //             ],
-    //             [
-    //                 'sort_order' => $index,
-    //             ]
-    //         );
-    //     }
-    // }
+        foreach ($items as $index => $name) {
+            ComboPackItems::updateOrCreate(
+                [
+                    'combo_pack_id' => $comboPackId,
+                    'name'          => $name,
+                ],
+                [
+                    'sort_order' => $index,
+                ]
+            );
+        }
+    }
 
 }

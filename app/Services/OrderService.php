@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Orders;
+use App\Models\product\ComboOffer;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -51,52 +52,71 @@ class OrderService
     // -------------------------------------------------------------------------
 
     public function createOrder(array $validated): Orders
-    {
-        return DB::transaction(function () use ($validated) {
-            $cust = $validated['customer'];
+{
+    return DB::transaction(function () use ($validated) {
+        $cust = $validated['customer'];
 
-            $customer = Customer::updateOrCreate(
-                ['mobile' => $cust['phone']],
-                [
-                    'name'    => $cust['name'],
-                    'email'   => $cust['email'] ?? null,
-                    // 'address' => $cust['address'],
-                    'city'    => $cust['city'],
-                    'state'   => $cust['state'],
-                    'pincode' => $cust['postcode'],
-                ]
-            );
+        $customer = Customer::updateOrCreate(
+            ['mobile' => $cust['phone']],
+            [
+                'name'    => $cust['name'],
+                'email'   => $cust['email'] ?? null,
+                'city'    => $cust['city'],
+                'state'   => $cust['state'],
+                'pincode' => $cust['postcode'],
+            ]
+        );
 
-            $order = $this->orderRepository->createOrder([
-                'order_number'     => 'ORD-' . date('Y') . '-' . strtoupper(Str::random(6)),
-                'customer_id'      => $customer->id,
-                // 'shipping_address' => $cust['address'],
-                'shipping_city'    => $cust['city'],
-                'shipping_state'   => $cust['state'],
-                'shipping_pincode' => $cust['postcode'],
-                'total_amount'     => $validated['total'],
-                'payment_status'   => 'pending',
-                'order_status'     => 'placed',
-            ]);
+        $order = $this->orderRepository->createOrder([
+            'order_number'     => 'ORD-' . date('Y') . '-' . strtoupper(Str::random(6)),
+            'customer_id'      => $customer->id,
+            'shipping_city'    => $cust['city'],
+            'shipping_state'   => $cust['state'],
+            'shipping_pincode' => $cust['postcode'],
+            'total_amount'     => $validated['total'],
+            'payment_status'   => 'pending',
+            'order_status'     => 'placed',
+        ]);
 
-            $orderItems = collect($validated['items'])->map(fn ($item) => [
-                'order_id'      => $order->id,
-                'product_id'    => $item['id'],
-                'product_name'  => $item['name'],
-                'product_price' => $item['discount_rate'],
-                'quantity'      => $item['qty'],
-                'subtotal'      => $item['discount_rate'] * $item['qty'],
-                'created_at'    => now(),
-                'updated_at'    => now(),
-            ])->toArray();
+        $orderItems = collect($validated['items'])->map(function ($item) use ($order) {
+            if (!empty($item['is_combo'])) {
+                $combo = ComboOffer::findOrFail($item['combo_id']);
+                $qty   = (int) $item['qty'];
 
-            OrderItem::insert($orderItems);
+                return [
+                    'order_id'       => $order->id,
+                    'product_id'     => null,
+                    'combo_offer_id' => $combo->id,
+                    'product_name'   => $combo->name,
+                    'product_price'  => $combo->combo_price,
+                    'quantity'       => $qty,
+                    'subtotal'       => $combo->combo_price * $qty,
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                ];
+            }
 
-            $this->sendOrderMail($order, $orderItems, $customer);
-            $this->dispatchAdminTelegramAlert($order, $orderItems, $customer);
-            return $order;
-        });
-    }
+            return [
+                'order_id'       => $order->id,
+                'product_id'     => $item['id'],
+                'combo_offer_id' => null,
+                'product_name'   => $item['name'],
+                'product_price'  => $item['discount_rate'],
+                'quantity'       => $item['qty'],
+                'subtotal'       => $item['discount_rate'] * $item['qty'],
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ];
+        })->toArray();
+
+        OrderItem::insert($orderItems);
+
+        $this->sendOrderMail($order, $orderItems, $customer);
+        $this->dispatchAdminTelegramAlert($order, $orderItems, $customer);
+
+        return $order;
+    });
+}
 
     public function updateOrderStatus(int $id, array $validated): Orders
     {
