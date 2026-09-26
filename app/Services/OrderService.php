@@ -209,7 +209,7 @@ class OrderService
         $totalQty  = (int) $items->sum('quantity'); // total quantity
 
         // Admin order link
-        $orderUrl = url("/admin/orders/{$order->id}");
+        $orderUrl = 'https://mkpattasukadai.com/admin/orders/' . $order->id;
 
         // Customer WhatsApp link (message already URL-encoded)
         $digits = substr(preg_replace('/\D+/', '', (string) $customer->mobile), -10);
