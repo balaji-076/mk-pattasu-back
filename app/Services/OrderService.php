@@ -171,13 +171,14 @@ class OrderService
 
     private function buildWhatsAppMessage(Orders $order, Customer $customer): string
     {
-        $grandTotal = collect($order->items)->sum(fn ($item) => (float) $item->subtotal);
+        // $order->total_amount direct-ah use pannidalaam, items sum panna theva illa
+        $totalAmount = number_format((float) ($order->total_amount ?? 0), 2);
 
         $msg  = "Dear {$customer->name},\n\n";
         $msg .= "Thank you for shopping with Mk Pattasu Kadai.\n";
         $msg .= "Your order has been placed successfully.\n\n";
         $msg .= "Order No: {$order->order_number}\n";
-        $msg .= "Amount: ₹{$grandTotal}\n\n";
+        $msg .= "Amount: ₹{$totalAmount}\n\n";
         $msg .= "Track your order:\n";
         $msg .= "https://mkpattasukadai.com/order-status/{$order->order_number}\n\n";
         $msg .= "Warm regards,\n";
@@ -205,13 +206,16 @@ class OrderService
     private function composeAdminTelegramAlert(Orders $order, array $orderItems, Customer $customer): string
     {
         $items     = collect($orderItems);
-        $itemCount = $items->count();               // different products
-        $totalQty  = (int) $items->sum('quantity'); // total quantity
+        $itemCount = $items->count();
+        $totalQty = (int) $items->sum(function ($item) {
+            $qty = is_array($item) ? ($item['quantity'] ?? 0) : ($item->quantity ?? 0);
+            return (int) $qty;
+        });
 
         // Admin order link
         $orderUrl = 'https://mkpattasukadai.com/admin/orders/' . $order->id;
 
-        // Customer WhatsApp link (message already URL-encoded)
+        // Customer WhatsApp link
         $digits = substr(preg_replace('/\D+/', '', (string) $customer->mobile), -10);
         $waUrl  = 'https://wa.me/91' . $digits . '?text=' . $this->buildWhatsAppMessage($order, $customer);
 
