@@ -111,8 +111,8 @@ class OrderService
 
         OrderItem::insert($orderItems);
 
-        $this->sendOrderMail($order, $orderItems, $customer);
-        $this->dispatchAdminTelegramAlert($order, $orderItems, $customer);
+        // $this->sendOrderMail($order, $orderItems, $customer);
+        // $this->dispatchAdminTelegramAlert($order, $orderItems, $customer);
 
         return $order;
     });
